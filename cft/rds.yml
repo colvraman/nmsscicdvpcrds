@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: RDS PostgreSQL Instance
+
+Parameters:
+  VPCId:
+    Type: String
+  SubnetId:
+    Type: String
+  SGId:
+    Type: String
+
+Resources:
+  MyDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds: [!Ref SubnetId]
+
+  MyRDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      EngineVersion: "17"
+      MasterUsername: masteruser
+      MasterUserPassword: masterpass123
+      AllocatedStorage: 20
+      VPCSecurityGroups: [!Ref SGId]
+      DBSubnetGroupName: !Ref MyDBSubnetGroup
+      PubliclyAccessible: true
+
+Outputs:
+  RDSInstanceEndpoint:
+    Value: !GetAtt MyRDSInstance.Endpoint.Address
+    Export:
+      Name: RDSInstanceEndpoint
