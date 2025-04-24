@@ -28,6 +28,7 @@ Resources:
       VPCSecurityGroups: [!Ref SGId]
       DBSubnetGroupName: !Ref MyDBSubnetGroup
       PubliclyAccessible: true
+      MultiAZ: false
 
 Outputs:
   RDSInstanceEndpoint:
