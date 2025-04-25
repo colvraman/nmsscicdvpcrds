@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing...
+  build:
+    commands:
+      - echo Building...
+      - zip -r build.zip .
+artifacts:
+  files:
+    - build.zip

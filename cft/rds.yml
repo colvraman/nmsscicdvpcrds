@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template for PostgreSQL RDS
+
+Parameters:
+  DBUsername:
+    Description: The database admin account username
+    Type: String
+    Default: postgres
+  DBPassword:
+    Description: The database admin account password
+    Type: String
+    NoEcho: true
+  VpcId:
+    Description: VPC where RDS will be deployed
+    Type: AWS::EC2::VPC::Id
+  Subnet1:
+    Description: First subnet ID for RDS Subnet Group
+    Type: AWS::EC2::Subnet::Id
+  Subnet2:
+    Description: Second subnet ID for RDS Subnet Group
+    Type: AWS::EC2::Subnet::Id
+
+Resources:
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable access to RDS
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0  # ⚠️ Replace with a restricted CIDR block in production
+
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds:
+        - !Ref Subnet1
+        - !Ref Subnet2
+
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBName: MyDatabase
+      Engine: postgres
+      EngineVersion: "15.3"
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: 20
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+      MultiAZ: false
+      PubliclyAccessible: true
+      StorageType: gp2
+      BackupRetentionPeriod: 7
+
+Outputs:
+  RDSInstanceEndpoint:
+    Description: The connection endpoint for the PostgreSQL RDS instance
+    Value: !GetAtt RDSInstance.Endpoint.Address

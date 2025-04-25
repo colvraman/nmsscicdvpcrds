@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: S3 Bucket
+
+Resources:
+  AppS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub app-bucket-${AWS::AccountId}-${AWS::Region}
+
+Outputs:
+  BucketName:
+    Value: !Ref AppS3Bucket
+    Export:
+      Name: AppS3BucketName
